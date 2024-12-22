@@ -4,7 +4,7 @@ import serial
 import time
 from PIL import Image
 import pymysql
-from db.py import get_db_connection
+import db
 
 app = Flask(__name__)
 cors = cors.CORS(app)
