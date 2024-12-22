@@ -39,7 +39,28 @@ function App() {
 
       setGCode(response.data.gcode);
     } catch (error) {
-      console.error("Upload failed", error);
+      console.error("Upload failed", error.response || error.message || error);
+      alert("이미지 업로드에 실패했습니다. 서버를 확인하세요.");
+    }
+  };
+
+  const handleGenerateGCode = async () => {
+    try {
+      const response = await axios.get(
+        "http://10.150.150.199:5000/generate_gcode"
+      );
+      if (response.data && response.data.gcode) {
+        setGCode(response.data.gcode);
+        alert("G-code가 성공적으로 생성되었습니다!");
+      } else {
+        alert("G-code 생성 실패!");
+      }
+    } catch (error) {
+      console.error(
+        "GCode generation failed:",
+        error.response || error.message || error
+      );
+      alert("G-code 생성 중 오류가 발생했습니다.");
     }
   };
 
@@ -77,6 +98,7 @@ function App() {
         ref={imgRef}
       />
       <button onClick={handleUpload}>이미지 업로드</button>
+      <button onClick={handleGenerateGCode}>GCode로 추출하기</button>
 
       {gcode && (
         <div>
