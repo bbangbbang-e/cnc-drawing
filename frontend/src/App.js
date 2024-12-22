@@ -1,5 +1,5 @@
-import './App.css';
-import {useState, useRef, useEffect} from "react";
+import "./App.css";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
 function App() {
@@ -26,12 +26,16 @@ function App() {
     }
 
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append("image", file);
 
     try {
-      const response = await axios.post("http://10.150.150.199:5000/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        "http://10.150.150.199:5000/upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       setGCode(response.data.gcode);
     } catch (error) {
@@ -45,9 +49,13 @@ function App() {
       return;
     }
     try {
-      const response = await axios.post("http://10.150.150.199:5000/send_gcode_to_arduino", { gcode }, {
-        headers: {"Content-Type": "application/json"},
-      });
+      const response = await axios.post(
+        "http://10.150.150.199:5000/send_gcode_to_arduino",
+        { gcode },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       alert("아두이노로 전송 성공!");
     } catch (error) {
       console.error("Send to Arduino failed", error);
