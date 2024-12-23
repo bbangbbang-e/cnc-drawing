@@ -8,5 +8,3 @@ class Database:
       database="gcode_db",
       cursorclass=pymysql.cursors.DictCursor
     )
-  def get(self):
-    return "a"
