@@ -37,10 +37,15 @@ function App() {
         }
       );
 
-      setGCode(response.data.gcode);
+      if (response.data.contours_path) {
+        setImgFile(`http://10.150.150.199:5000/${response.data.contours_path}`);
+        alert("외곽선 추출 성공!");
+      } else {
+        alert("외곽선 추출 실패!");
+      }
     } catch (error) {
       console.error("Upload failed", error.response || error.message || error);
-      alert("이미지 업로드에 실패했습니다. 서버를 확인하세요.");
+      alert("이미지 업로드 및 외곽선 추출에 실패했습니다.");
     }
   };
 

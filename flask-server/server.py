@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 import flask_cors as cors
 import serial
+import cv2
 import time
 from PIL import Image
 import pymysql
 from modules.db import Database
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 cors = cors.CORS(app)
@@ -12,6 +14,47 @@ cors = cors.CORS(app)
 # 아두이노 시리얼 포트 및 보드레이트를 실제 환경에 맞게 설정
 ARDUINO_PORT = '/dev/ttyACM0' # 실제 포트 번호 입력
 BAUDRATE = 115200
+UPLOAD_FORDER = './upload'
+os.makedirs(UPLOAD_FORDER, exist_ok=True)
+
+app.config['UPLOAD_FORDER'] = UPLOAD_FORDER
+
+def extract_contours(image_path):
+    try:
+        # OpenCV를 사용하여 이미지 읽기
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        if image is None:
+            raise ValueError("이미지를 읽을 수 없습니다.")
+
+        # 외곽선 검출
+        blurred = cv2.GaussianBlur(image, (5, 5), 0)
+        edges = cv2.Canny(blurred, 50, 150)
+
+        # 외곽선만 있는 이미지 저장
+        contours_path = os.path.join(app.config['UPLOAD_FOLDER'], "contours.png")
+        cv2.imwrite(contours_path, edges)
+
+        return contours_path
+    except Exception as e:
+        return f"Contour extraction error: {str(e)}"
+
+@app.route("/upload", methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({"status": "error", "message": "image file not found"}), 400
+
+    image = request.files['image']
+    filename = secure_filename(image.filename)
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    image.save(image_path)
+
+    # 외곽선 추출
+    contours_path = extract_contours(image_path)
+    if "error" in contours_path:
+        return jsonify({"status": "error", "message": contours_path}), 500
+
+    return jsonify({"status": "success", "contours_path": contours_path}), 200
+
 
 def convert_imgage_to_gcode(image_path):
 		try:
