@@ -4,7 +4,7 @@ import serial
 import time
 from PIL import Image
 import pymysql
-import db
+from modules.db import Database
 
 app = Flask(__name__)
 cors = cors.CORS(app)
@@ -48,7 +48,7 @@ def upload_image():
 
     # G-code DB 저장
 	try:
-			connection = get_db_connection()
+			connection = Database()
 			with connection.cursor() as cursor:
 					sql = "INSERT INTO gcode_data (gcode_content) VALUES (%s)"
 					cursor.execute(sql, (gcode,))
